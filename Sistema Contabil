@@ -1,0 +1,102 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.Date;
+
+public class SistemaContabil extends JFrame {
+    private ArrayList<Cliente> clientes = new ArrayList<>();
+    private ArrayList<Transacao> transacoes = new ArrayList<>();
+
+    public SistemaContabil() {
+        setTitle("Sistema Contábil");
+        setSize(400, 300);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        // Painel de cadastro de clientes
+        JPanel panelCliente = new JPanel();
+        panelCliente.setLayout(new GridLayout(5, 2));
+
+        JLabel lblNome = new JLabel("Nome:");
+        JTextField txtNome = new JTextField();
+        JLabel lblEndereco = new JLabel("Endereço:");
+        JTextField txtEndereco = new JTextField();
+        JLabel lblTelefone = new JLabel("Telefone:");
+        JTextField txtTelefone = new JTextField();
+
+        JButton btnCadastrar = new JButton("Cadastrar Cliente");
+        btnCadastrar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Cliente cliente = new Cliente(clientes.size() + 1, txtNome.getText(), txtEndereco.getText(), txtTelefone.getText());
+                clientes.add(cliente);
+                JOptionPane.showMessageDialog(null, "Cliente cadastrado com sucesso!");
+            }
+        });
+
+        // Painel de cadastro de transações
+        JPanel panelTransacao = new JPanel();
+        panelTransacao.setLayout(new GridLayout(4, 2));
+
+        JLabel lblCliente = new JLabel("Cliente:");
+        JComboBox<String> comboClientes = new JComboBox<>();
+        for (Cliente cliente : clientes) {
+            comboClientes.addItem(cliente.getNome());
+        }
+        JLabel lblValor = new JLabel("Valor:");
+        JTextField txtValor = new JTextField();
+        JLabel lblDescricao = new JLabel("Descrição:");
+        JTextField txtDescricao = new JTextField();
+
+        JButton btnRegistrarTransacao = new JButton("Registrar Transação");
+        btnRegistrarTransacao.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int clienteIndex = comboClientes.getSelectedIndex();
+                if (clienteIndex >= 0) {
+                    Cliente cliente = clientes.get(clienteIndex);
+                    Transacao transacao = new Transacao(transacoes.size() + 1, cliente, Double.parseDouble(txtValor.getText()), new Date(), txtDescricao.getText());
+                    transacoes.add(transacao);
+                    JOptionPane.showMessageDialog(null, "Transação registrada com sucesso!");
+                }
+            }
+        });
+
+        // Botão para gerar relatório financeiro
+        JButton btnGerarRelatorio = new JButton("Gerar Relatório Financeiro");
+        btnGerarRelatorio.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Relatorio relatorio = new Relatorio(transacoes);
+                relatorio.gerarRelatorio("relatorio_financeiro.txt");
+            }
+        });
+
+        // Adicionando os componentes no painel
+        panelCliente.add(lblNome);
+        panelCliente.add(txtNome);
+        panelCliente.add(lblEndereco);
+        panelCliente.add(txtEndereco);
+        panelCliente.add(lblTelefone);
+        panelCliente.add(txtTelefone);
+        panelCliente.add(new JLabel());
+        panelCliente.add(btnCadastrar);
+
+        panelTransacao.add(lblCliente);
+        panelTransacao.add(comboClientes);
+        panelTransacao.add(lblValor);
+        panelTransacao.add(txtValor);
+        panelTransacao.add(lblDescricao);
+        panelTransacao.add(txtDescricao);
+        panelTransacao.add(new JLabel());
+        panelTransacao.add(btnRegistrarTransacao);
+
+        // Adicionar tudo à janela
+        add(panelCliente, BorderLayout.NORTH);
+        add(panelTransacao, BorderLayout.CENTER);
+        add(btnGerarRelatorio, BorderLayout.SOUTH);
+
+        setVisible(true);
+    }
+
+    public static void main(String[] args) {
+        new SistemaContabil();
+    }
+}
